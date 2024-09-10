@@ -1,0 +1,77 @@
+---------------------------------------------
+OSHONSOFT Z80 ASSEMBLER LISTING
+Line   Addr Opcode      Label   Instruction
+---------------------------------------------
+0001   0000             ; Programa RAÍZ CUADRADA
+0002   0000             ; Registro de entrada:
+0003   0000             ;   B: número en BCD (de 00 a 99)
+0004   0000             ; Registro de salida:
+0005   0000             ;   C: raíz cuadrada entera en BCD
+0006   0000             
+0007   0000                     org 000h          ; Inicio del programa
+0008   0000             
+0009   0000 78          START:  ld a, b           ; Carga lo que hay en B, en A
+0010   0001 CD 19 00            call BCD_2_BIN
+0011   0004 47                  ld b, a           ; Guardo el binario en B
+0012   0005 AF                  xor a             ; Borra lo que hay en A
+0013   0006 4F                  ld c, a
+0014   0007 16 01               ld d, 1
+0015   0009             
+0016   0009 7A          LOOP:   ld a, d           ; Carga lo que hay en D en A
+0017   000A CD 3B 00            call ROOT
+0018   000D B8                  cp b              ; Compara con B
+0019   000E 38 04               jr c, DONE        ; Si el cuadrado de D < B, terminará el ciclo
+0020   0010 0C                  inc c
+0021   0011 14                  inc d
+0022   0012 18 27               jr ROOT
+0023   0014             
+0024   0014 CD 2F 00    DONE:   call BIN_2_BCD
+0025   0017 4F                  ld c, a           ; Guarda el valor de la raíz en C
+0026   0018 C9                  ret               ; Termina el programa
+0027   0019             
+0028   0019             	;SUBRUTINA PARA CONVERTIR DE BCD A BINARIO
+0029   0019             BCD_2_BIN:
+0030   0019 78                  ld a, b           ; Guarda lo que hay en B (Valor en BCD) en A
+0031   001A 5F                  ld e, a           ; Guardar el valor original en E
+0032   001B E6 0F               and 0Fh
+0033   001D 57                  ld d, a
+0034   001E 7B                  ld a, e
+0035   001F CB 3F               srl a
+0036   0021 CB 3F               srl a
+0037   0023 CB 3F               srl a
+0038   0025 CB 3F               srl a
+0039   0027 5F                  ld e, a           ; Guarda las decenas en E
+0040   0028 7B                  ld a, e           ; Multplica por 10
+0041   0029 87                  add a, a          ; A = E * 2
+0042   002A 87                  add a, a          ; A = E * 4
+0043   002B 87                  add a, a          ; A = E * 8
+0044   002C 83                  add a, e          ; A = E * 8 + E = E * 9
+0045   002D 82                  add a, d          ; Sumar las unidades a A
+0046   002E C9                  ret               ; Devuelve el valor binario en A
+0047   002F             
+0048   002F             	;SUBRUTINA PARA CONVERTIR BINARIO A BCD
+0049   002F             BIN_2_BCD:
+0050   002F 5F                  ld e, a           ; Guarda el valor binario en E
+0051   0030 16 0A               ld d, 10          ; Carga 10 en D
+0052   0032 AF                  xor a             ; Borra lo que hay en A
+0053   0033             DIV:
+0054   0033 92                  sub d             ; Resta 10 de lo que hay en A
+0055   0034 38 03               jr c, CONVERT     ; Si el resultado es negativo, continúa con la conversión
+0056   0036 3C                  inc a             ; Incrementa el número de decenas en A
+0057   0037 18 FA               jr DIV 	          ; REPITE EL CICLO
+0058   0039             
+0059   0039             CONVERT:
+0060   0039 83                  add a, e          ; Sumar las unidades restantes en A
+0061   003A C9                  ret               ; Devuelve el valor BCD en A
+0062   003B             
+0063   003B             	;SUBRUTINA PARA LA RAÍZ CUADRADA
+0064   003B             ROOT:
+0065   003B 5F                  ld e, a           ; Guardar el valor de A (D) en E
+0066   003C 3E 00               ld a, 0           ; Inicializar A en 0 para almacenar el resultado
+0067   003E 6B                  ld l, e           ; Cargar el valor de E en L para el ciclo
+0068   003F             MUL:
+0069   003F 83                  add a, e          ; Sumar E a A
+0070   0040 2D                  dec l             ; Decrementar L
+0071   0041 20 FC               jr nz, MUL   ; Repetir hasta que L sea 0 (A = E * E)
+0072   0043 C9                  ret               ; Devuelve el cuadrado en A
+Number of errors = 0
