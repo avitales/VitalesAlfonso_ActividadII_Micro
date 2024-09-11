@@ -1,0 +1,41 @@
+---------------------------------------------
+OSHONSOFT Z80 ASSEMBLER LISTING
+Line   Addr Opcode      Label   Instruction
+---------------------------------------------
+0001   0000             ; Programa RAÍZ CUADRADA
+0002   0000             
+0003   0000             ; Declaro las variables de los registros a usar
+0004   0000 78          	LD A, B  ; Cargo el valor de B (número en BCD) en A.
+0005   0001 0E 00       	LD C, 0  ; Inicio en 0 al registro C (que contendrá el resultado)
+0006   0003 1E 00       	LD E, 0  ; Inicio en 0 al registro R (Este será el que se compare
+0007   0005             		 ; con el original, y fungirá como una estimación a la
+0008   0005             		 ; raíz cuadrada)
+0009   0005             
+0010   0005             ; Subrutina que comienza el loop del programa
+0011   0005             LOOP:
+0012   0005 57          	LD D, A  ; Cargo D en A. D será útil después en el programa.
+0013   0006 7B          	LD A, E  ; Cargo  el valor de mi estimación en A
+0014   0007 87          	ADD A, A ; Sumo lo que hay en A (en este caso, el registro R) en A.
+0015   0008 83          	ADD A, E ; Sumo lo que hay en R a A. Esto me generará que A valga
+0016   0009             		 ; 3 veces lo que hay en el estimador (A = 3R).
+0017   0009 6F          	LD L, A  ; Guardo el valor actual de A (3R) en este registro (L)
+0018   000A 26 00       	LD H, 0  ; Se inicializa en 0 el registro H. Esto para evitar errores
+0019   000C             		 ; ya que estamos utilizando el registro HL. Y según entendí, se
+0020   000C             		 ; hace para evitar errores
+0021   000C 7A          	LD A, D  ; Cargo el valor D que guardé al inicio (representando mi valor
+0022   000D             		 ; original)
+0023   000D BD          	CP L	 ; Comparo lo que hay en mi registro actual (A) con lo que hay en L.
+0024   000E             		 ; En este caso, 3R.
+0025   000E 38 03       	JR C, END; Si el D es menor que L (3R), ejecuta END.
+0026   0010             		 ; O lo que es lo mismo, si el flag de acarreo (C) está
+0027   0010             		 ; encendido, termina el programa. Si D NO es menor que L,
+0028   0010             		 ; entonces continuará con la siguiente instrucción.
+0029   0010 1C          	INC E
+0030   0011 18 F2       	JR LOOP  ; Este par de instrucciones incrementar mi estimación de la raíz
+0031   0013             		 ; cuadrada, y luego repite todo el ciclo.
+0032   0013             
+0033   0013             ; Subrutina que terminará mi programa
+0034   0013             END:
+0035   0013 4B          	LD C, E  ; Para terminar, guarda el valor de R en el registro C.
+0036   0014 C9          	RET
+Number of errors = 0
